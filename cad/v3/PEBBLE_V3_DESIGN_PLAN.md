@@ -1,269 +1,249 @@
-# Pebble V3 — Concept-Accurate Mechanical Architecture
+# Pebble V3 — UX-First Concept-Accurate Mechanical Architecture
 
 ## 1. Design intent
 
-Pebble V3 is a clean mechanical architecture revision, not a cosmetic patch to V2.5.
+Pebble V3 is a clean architecture revision, not a cosmetic patch to V2.5.
 
-Primary objective:
-- preserve the original Pebble creature silhouette;
-- hide motors, upper leg linkages and chassis inside the body;
-- expose only soft-looking feet / minimal leg necks;
-- retain real walking and expressive body motion;
-- package battery, compute, MCU, audio and vision inside a manufacturable enclosure.
+This is a **user-experience-first product**. The order of authority is:
 
-The V2.5 assembly remains useful as a linkage/mechanism reference but is no longer the exterior product architecture.
+1. recognizable Pebble silhouette and proportions;
+2. expressive visible foot/leg behavior;
+3. hard packaging feasibility;
+4. internal structural skeleton;
+5. soft packaging and DFM optimization.
 
----
+The body is therefore not allowed to become a generic ellipsoid simply because a board or battery box is convenient to package. Conversely, the concept is not allowed to remain physically impossible: after the shell and leg architecture are established, the hard constraints must be checked immediately and the design iterated only where genuinely necessary.
 
-## 2. Hard constraints frozen before surfacing
-
-See `pebble_v3_constraints.json`.
-
-The CAD must first contain non-negotiable keepout bodies for:
-
-1. 2S1P 21700 Li-ion battery pack, 5 Ah class
-2. Linux compute module + custom carrier bay
-3. ESP32-S3 real-time controller module
-4. motor/power regulation PCB bay
-5. four N20-class encoder gearmotor envelopes
-6. four leg swept volumes
-7. face display/visor volume
-8. camera volume
-9. speaker + microphone volumes
-10. USB-C/service access
-11. shell wall thickness, bosses and cable corridors
-
-No cosmetic surface is accepted until these fit without overlap.
+The V2.5 assembly remains useful as a mechanism reference but is not the exterior product architecture.
 
 ---
 
-## 3. Why four independent leg actuators
+## 2. UX geometry comes first
 
-The Pebble concept benefits from four independently phase-controlled compact leg mechanisms rather than one shared axle or a differential-drive chassis.
+The first V3 CAD artifact is the **concept shell plus expressive leg envelope**, not an electronics packaging skeleton.
 
-One actuator per corner allows the software to control relative leg phase and therefore produce both locomotion and expression with the same hardware.
+The shell must be built directly from the concept reference using controlled front, side and top silhouettes.
 
-The motor does not need a full humanoid 2-DOF leg. A compact closed-chain/four-bar mechanism can convert continuous crank rotation into a repeatable foot trajectory.
+Target characteristics:
 
-The key expression variable is not only motor speed; it is the relative phase of each leg.
-
-Examples:
-
-### Neutral stand
-All feet at approximately equal support height.
-
-### Walk / crawl
-Four crank phases offset to maintain a high duty factor and low body disturbance.
-
-### Happy bounce
-All four legs move largely in phase, with a low-amplitude vertical body oscillation.
-
-### Curious tilt left
-Right-side legs extend slightly while left-side legs crouch, producing a small body roll.
-
-### Curious tilt right
-Mirror of left tilt.
-
-### Bow / greeting
-Front legs crouch while rear legs extend slightly.
-
-### Proud / alert posture
-Front and rear legs move toward the high-support part of the trajectory, raising the belly within mechanical limits.
-
-### Shy / sleepy crouch
-All legs move toward the low-support part of the trajectory.
-
-### Foot tap
-One front leg is phase-jogged around a short local trajectory while the other three remain in stable support.
-
-### Waddle / playful walk
-Left/right timing and amplitude are deliberately biased while retaining static support margin.
-
-These motions are achieved by coordinated phase targets and speed profiles. They do not require visibly articulated humanoid knees.
-
----
-
-## 4. Leg module architecture
-
-Each corner receives a compact removable leg cassette:
-
-- N20 encoder gearmotor mounted horizontally within the belly;
-- small crank on gearbox output;
-- supported linkage pivot on the structural chassis;
-- coupler/rocker arranged as a compact four-bar;
-- short lower link exits through a shaped shell pocket;
-- compliant rounded foot forms the visible product element;
-- optional passive ankle/compliance element isolates impact and helps keep the foot visually flat.
-
-Important mechanical rule:
-
-The gearbox output shaft should not be treated as the sole structural bearing for side loads and impacts. The linkage load path should be supported by a chassis-mounted pivot/bearing or by a supported crank arrangement where practical.
-
-The leg cassette must be removable without dismantling the battery or face electronics.
-
----
-
-## 5. Leg swept-volume workflow
-
-The new shell is not created first and then cut when collisions occur.
-
-For each leg:
-
-1. build the exact mechanism skeleton;
-2. rotate it through a full 360-degree crank cycle;
-3. union/sweep all moving hard-part volumes;
-4. add minimum 2 mm mechanical clearance;
-5. retain that result as a `LEG_SWEEP_KEEPOUT` solid;
-6. mirror to other corners after confirming handedness;
-7. construct the cosmetic underside around these solids.
-
-This automatically creates the required hidden wheel-arch / leg-pocket geometry without exposing the complete mechanism.
-
----
-
-## 6. Body geometry workflow
-
-The V3 shell should be generated from controlled cross-sections, not a single ellipsoid.
-
-Target shape characteristics:
-
-- width approximately 165 mm;
-- depth approximately 150 mm;
-- broad lower-middle mass;
+- approximately 165 mm overall body width;
+- approximately 150 mm body depth;
+- approximately 170 mm overall height including antennas;
+- nominal belly clearance about 8 mm;
+- broad lower-middle body volume;
 - subtly narrowed crown;
-- flattened / softened belly for 8 mm nominal ground clearance;
 - fuller front cheeks around the visor;
+- softened / slightly flattened belly rather than a spherical bottom;
 - smooth rear taper;
 - no visible chassis deck;
-- continuous outer shell down around the leg pockets.
+- motors and upper linkage visually hidden;
+- only the styled feet and the minimum required lower-leg neck visible.
 
-Recommended CAD construction:
+The shell should be generated from multiple cross-sections / superellipse-like profiles or an equivalent controlled surface, not from one ellipsoid primitive.
 
-1. Front orthographic silhouette sketch
-2. Side orthographic silhouette sketch
-3. Top/bottom footprint sketch
-4. Multiple Z-section rounded-squircle / superellipse profiles
-5. Loft or SubD-like surface construction from these sections
-6. controlled lower-belly flattening
-7. visor recess boolean / surface trim
-8. shell thickness
-9. leg swept-volume pocket subtraction
-10. seam, bosses and service-door details
+### Shell modeling order
 
-The shell should be judged primarily by front and side silhouette overlays against the concept reference before internal cosmetic details are added.
+1. front silhouette sketch;
+2. side silhouette sketch;
+3. top/footprint sketch;
+4. multiple Z-section profiles;
+5. loft / surface body;
+6. lower-belly shaping and ground-clearance target;
+7. real visor recess and visor insert geometry;
+8. antenna roots / appearance;
+9. provisional shell thickness;
+10. only later: internal bosses, seams and service openings.
 
----
-
-## 7. Face / visor architecture
-
-The black face region is a real mechanical feature, not a texture.
-
-It needs:
-
-- a broad rounded rectangular / organic visor surface;
-- shallow recess into the shell;
-- internal display plane behind smoked acrylic/polycarbonate;
-- camera aperture hidden within the black region;
-- enough internal volume to avoid forcing the whole body into a spherical form.
-
-The visor is one of the main visual anchors of the concept and should be modeled early in V3.
+The concept shell is judged by silhouette overlays before internal packaging is allowed to distort it.
 
 ---
 
-## 8. Battery packaging
+## 3. Expressive leg architecture is designed with the shell
 
-Baseline is a 2S1P 21700 pack, approximately 7.2 V nominal, 5 Ah / 36 Wh class.
+Pebble uses four independently controlled compact leg mechanisms, one per corner.
 
-Placement:
+The visible experience matters more than exposing how the mechanism works. From the outside the user should see small soft-looking feet emerging from the body, not a mechanical platform or long exposed linkage.
 
-- horizontal;
-- as low and central as possible;
-- mechanically retained in an insulated cradle;
-- separated from motor/linkage sweep zones;
-- accessible after removal of the bottom/service panel;
-- thermal separation from high-loss regulators and compute module.
+Each leg is provisionally based on:
 
-With 36 Wh nominal energy, illustrative system runtime is approximately:
+- compact N20-class encoder gearmotor inside the belly;
+- crank drive;
+- supported linkage pivot;
+- compact closed-chain / four-bar geometry;
+- short concealed lower link exiting through a shaped shell pocket;
+- compliant rounded foot;
+- optional passive ankle/compliance element.
 
-- 4.5 h at 8 W average;
-- 3.6 h at 10 W;
-- 3.0 h at 12 W;
-- 2.6 h at 14 W.
+The gearbox shaft must not be treated as the sole structural bearing for impact and radial loading. Final load paths will use chassis-supported pivots/bearings where required.
 
-These are energy-budget estimates, not guaranteed product runtimes; actual usable Wh, conversion losses, locomotion duty cycle and battery safety margins must be applied later.
+### Required expressive behaviors
 
----
+The leg geometry must support, before electronics packaging is optimized:
 
-## 9. Electronics packaging
+- neutral stand;
+- slow stable crawl;
+- happy bounce;
+- sleepy/shy crouch;
+- alert/tall posture;
+- left curiosity tilt;
+- right curiosity tilt;
+- forward bow/greeting;
+- playful waddle;
+- single-front-foot tap;
+- asymmetric step / look-around pose.
 
-### ESP32-S3
-Use an ESP32-S3-WROOM module on a custom carrier in the product CAD rather than reserving the large development board.
-
-The prototype may use a DevKit externally/temporarily, but the internal mechanical product envelope should be based on the module + carrier architecture.
-
-### Linux compute
-Reserve a 55 x 40 mm compute-module class envelope plus carrier and connector keepouts. The compute board should sit higher than the battery but away from the moving leg roots.
-
-### Power
-A 2S battery bus requires dedicated regulation:
-
-- regulated motor rail;
-- regulated 5 V compute rail;
-- 3.3 V logic where required.
-
-The CAD must include connector bend radius and wiring volume, not only PCB outlines.
+These motions primarily come from coordinated relative phase and speed commands of the four legs rather than adding visibly humanoid joints.
 
 ---
 
-## 10. CAD development gates
+## 4. Leg motion is validated against the UX shell
 
-### Gate A — package blocks
-Only boxes/cylinders representing real components. Verify everything fits inside the target body.
+For one parameterized leg:
 
-### Gate B — exact leg skeleton
-Build one actual leg and verify intended foot trajectory and torque requirements.
+1. define the intended external foot trajectory;
+2. solve / tune linkage lengths and crank placement to create that trajectory;
+3. verify static support and required vertical body travel;
+4. sweep the complete moving mechanism through the validated motion range;
+5. create the hard-part swept volume;
+6. add mechanical clearance;
+7. compare that swept volume with the concept shell;
+8. move pivots / reshape local underside pockets while preserving the exterior silhouette;
+9. replicate and validate all four corners.
 
-### Gate C — four-leg kinematics
-Create all four mechanisms and run the validation pose set.
+The shell and leg architecture therefore converge together.
 
-### Gate D — swept keepouts
-Generate hard swept volumes and clearance bodies.
-
-### Gate E — concept shell
-Create the pebble-shaped external surface around the frozen package/keepout geometry.
-
-### Gate F — visor and underside
-Add real visor recess and integrate leg pockets into the belly.
-
-### Gate G — structural chassis
-Add motor mounts, bearing supports, battery cradle, PCB mounts and load paths.
-
-### Gate H — DFM / assembly
-Split shell, add bosses/screws/snaps, cable routes, service access, tolerances and fastener tool access.
-
-### Gate I — simulation correlation
-Export STEP/mesh and update MuJoCo geometry, masses, inertia, motor positions and motion limits from the physical CAD.
-
-Only after Gate I should the external design be considered V3.0 release-candidate geometry.
+We do **not** first freeze a large rectangular chassis and then lift the body to clear it.
 
 ---
 
-## 11. Immediate next modeling task
+## 5. Hard constraints are feasibility gates, not initial shape drivers
 
-Do not start by sculpting a beautiful shell.
+The known hard constraints in `pebble_v3_constraints.json` remain real and must be tested immediately after the concept shell and expressive leg geometry are credible.
 
-The next CAD artifact should be `Pebble_V3_Packaging_Skeleton` containing:
+Current hard items include:
 
-- external reference envelope;
-- battery keepout;
-- compute/carrier keepout;
-- ESP32/power keepouts;
-- visor/display/camera keepouts;
-- four motor blocks;
-- exact leg pivot coordinates;
-- one fully parameterized leg linkage;
-- four copied/mirrored leg mechanisms;
-- generated leg swept keepout volumes;
-- floor plane and 8 mm belly target plane.
+1. battery energy/storage requirement;
+2. Linux compute module + carrier;
+3. ESP32-S3 real-time controller;
+4. four encoder gearmotors;
+5. motor/power regulation electronics;
+6. visor/display volume;
+7. camera volume;
+8. speaker and microphone volumes;
+9. service / charging connector access;
+10. safe wiring and connector bend radii;
+11. leg swept volumes and mechanical clearances.
 
-That skeleton is the foundation for the new shell.
+The current battery baseline is a 2S1P 21700, 5 Ah / ~36 Wh class pack. The product controller baseline uses an ESP32-S3 module on a custom carrier rather than reserving a large development board. The Linux compute baseline is CM4/CM5-class mechanical volume.
+
+These dimensions are **feasibility constraints**, not permission to deform the concept prematurely.
+
+### Hard-constraint decision rule
+
+When a hard item does not fit, iterate in this order:
+
+1. rotate/reposition the component;
+2. redesign its carrier / mounting;
+3. exploit unused three-dimensional shell volume;
+4. change equivalent component/package while preserving functional requirement;
+5. alter internal leg/chassis architecture;
+6. make a small local shell change invisible to the primary silhouette;
+7. only as a last resort, change a major UX dimension — and record the reason.
+
+This prevents convenience-driven geometry creep.
+
+---
+
+## 6. Internal skeleton comes after shell + legs + hard-fit proof
+
+Only after the shell, leg trajectory and hard components fit do we design the real structural skeleton.
+
+The skeleton then follows the already-proven geometry and provides:
+
+- motor mounts;
+- supported leg pivots/bearings;
+- battery cradle;
+- compute and controller mounts;
+- visor/display support;
+- speaker support;
+- shell mounting bosses;
+- structural load paths;
+- cable routing;
+- serviceability.
+
+The skeleton is therefore an **enabling structure inside the experience envelope**, not the object around which the experience is wrapped.
+
+---
+
+## 7. Soft constraints follow
+
+After hard-fit and skeleton validation, optimize:
+
+- exact PCB placement;
+- screw count and screw access;
+- connector orientation;
+- manufacturing splits;
+- injection-molding draft / 3D-print allowances;
+- acoustic port details;
+- antenna RF keepouts;
+- thermal conduction paths;
+- assembly sequence;
+- repair/service access;
+- cable clipping and strain relief;
+- final material thickness;
+- cost and part-count reduction.
+
+Soft constraints may adjust internal details but should not visibly damage the approved Pebble silhouette or expressive motion.
+
+---
+
+## 8. Revised CAD development gates
+
+### Gate A — UX shell
+Create the concept-accurate body, visor and feet as appearance geometry. Approve front, side and isometric silhouettes.
+
+### Gate B — expressive leg trajectory
+Define foot path, body travel and the target expression poses. Build one exact parameterized leg mechanism that produces them.
+
+### Gate C — shell/leg convergence
+Fit the leg mechanism inside the approved body, generate swept volumes, create hidden underside pockets, and validate all four legs with no exterior platform.
+
+### Gate D — hard-constraint feasibility
+Insert battery, motors, compute, MCU, power, display, camera and audio keepouts. Prove the hard requirements fit. Iterate internal architecture before changing the primary exterior.
+
+### Gate E — structural skeleton
+Design the internal chassis, supported pivots, battery cradle, PCB mounts and shell attachment structure around the already-approved shell/leg/hard-package solution.
+
+### Gate F — kinematic and structural validation
+Run all expression and locomotion poses, collision checks, support-polygon checks, preliminary torque/current calculations and major load-path checks.
+
+### Gate G — soft packaging / DFM
+Add wiring, bosses, seams, fasteners, thermal/RF/acoustic details, tolerances and service access.
+
+### Gate H — simulation correlation
+Export STEP/mesh and update MuJoCo geometry, masses, inertia, motor locations and motion limits from the physical CAD.
+
+### Gate I — V3 release candidate
+Approve appearance, motion, hard packaging, structural feasibility and manufacturability together.
+
+---
+
+## 9. Immediate next modeling task
+
+The next CAD artifact is **`Pebble_V3_UX_Shell_Leg_Concept`**.
+
+It should contain:
+
+- concept-accurate exterior shell;
+- real recessed visor geometry;
+- antenna geometry;
+- floor plane and 8 mm belly reference;
+- four styled feet in neutral pose;
+- one parameterized expressive leg mechanism;
+- provisional motor position for that leg;
+- target foot trajectory;
+- key expression poses;
+- generated leg swept-volume overlay;
+- silhouette comparison views against the concept reference.
+
+No battery/PCB/chassis block should be allowed to alter the approved external silhouette at this stage. They enter at Gate D as a hard feasibility test.
