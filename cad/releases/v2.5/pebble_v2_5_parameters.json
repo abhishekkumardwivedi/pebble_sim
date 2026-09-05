@@ -1,0 +1,15 @@
+{
+  "concept_reference": "Pebble Creature V1 product design sheet",
+  "body_mm": [165,145,110],
+  "leg_motor_axes": {
+    "FL": [35,43,55.31718553762],
+    "FR": [35,-43,55.31718553762],
+    "RL": [-45,43,55.31718553762],
+    "RR": [-45,-43,55.31718553762]
+  },
+  "previous_v2_4_y_mm": 59,
+  "corrected_v2_5_y_mm": 43,
+  "inward_shift_each_side_mm": 16,
+  "shell_lower_opening_z_mm": 68,
+  "design_intent": "Upper leg root, motor, crank and rocker tucked inside body silhouette. Lower leg cap/ankle/foot remain visible."
+}
