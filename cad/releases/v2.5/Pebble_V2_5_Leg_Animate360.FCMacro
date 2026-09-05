@@ -1,0 +1,63 @@
+# Pebble V2.3 - 360 degree kinematic animation
+# FreeCAD 1.x. Uses exact four-bar closure equations.
+# Static detailed hardware (washers/spacers/double-shear forks) is in the STEP assembly.
+import math,time
+import FreeCAD as App, Part
+try:
+    import FreeCADGui as Gui
+except Exception:
+    Gui=None
+
+DOC="Pebble_V2_3_Motion"
+if DOC in App.listDocuments(): App.closeDocument(DOC)
+doc=App.newDocument(DOC)
+
+r=5.; d=20.; L=38.; R=24.; E=22.; pin=2.
+crank_y=5.5; cc_y=9.75; rock_y=3.0
+
+def cyl_y(rad,length,x,y0,z):
+    return Part.makeCylinder(rad,length,App.Vector(x,y0,z),App.Vector(0,1,0))
+def cap_local(length,width,t,h1=0,h2=0):
+    rr=width/2; y0=-t/2
+    s=Part.makeBox(length,t,width,App.Vector(0,y0,-rr)).fuse(cyl_y(rr,t,0,y0,0)).fuse(cyl_y(rr,t,length,y0,0))
+    if h1: s=s.cut(cyl_y(h1/2,t+2,0,y0-1,0))
+    if h2: s=s.cut(cyl_y(h2/2,t+2,length,y0-1,0))
+    return s
+def placed(local,x,z,ang,y):
+    s=local.copy(); s.rotate(App.Vector(),App.Vector(0,1,0),-math.degrees(ang)); s.translate(App.Vector(x,y,z)); return s
+def solve(th):
+    A=(r*math.cos(th),r*math.sin(th))
+    dx,dz=d-A[0],-A[1]; D=math.hypot(dx,dz)
+    a=(L*L-R*R+D*D)/(2*D); h=math.sqrt(max(0,L*L-a*a)); ux,uz=dx/D,dz/D
+    px,pz=A[0]+a*ux,A[1]+a*uz
+    c1=(px-uz*h,pz+ux*h); c2=(px+uz*h,pz-ux*h); B=c1 if c1[1]<c2[1] else c2
+    al=math.atan2(B[1]-A[1],B[0]-A[0]); be=math.atan2(B[1],B[0]-d)
+    F=(B[0]+E*math.sin(al),B[1]-E*math.cos(al))
+    return A,B,F,al,be
+
+crankL=cap_local(5,10,3,0,2).fuse(cyl_y(5.5,3,0,-1.5,0).cut(cyl_y(1.575,5,0,-2.5,0)))
+ccL=cap_local(38,8,4,2,2)
+carL=cap_local(22,7,4,2,2); carL.rotate(App.Vector(),App.Vector(0,1,0),90); carL.translate(App.Vector(38,0,0)); ccL=ccL.fuse(carL)
+rockL=cap_local(24,8,3,2,2)
+
+def obj(name,label,color):
+    o=doc.addObject("PartDesign::Feature",name); o.Label=label
+    if Gui: o.ViewObject.ShapeColor=color
+    return o
+crank=obj("Crank","Crank",(0.9,0.42,0.15)); cc=obj("CouplerCarrier","Rigid coupler + carrier",(0.22,0.48,0.78)); rock=obj("Rocker","Rocker",(0.28,0.65,0.34))
+foot=obj("FootMarker","Passive-foot neutral marker",(0.08,0.18,0.15))
+ctl=doc.addObject("App::FeaturePython","MotionController"); ctl.addProperty("App::PropertyAngle","CrankAngle")
+
+def update(a):
+    th=math.radians(a); A,B,F,al,be=solve(th)
+    crank.Shape=placed(crankL,0,0,th,crank_y); cc.Shape=placed(ccL,A[0],A[1],al,cc_y); rock.Shape=placed(rockL,20,0,be,rock_y)
+    foot.Shape=Part.makeBox(34,18,5,App.Vector(F[0]-17,cc_y-9,F[1]-12))
+    ctl.CrankAngle=a; doc.recompute()
+    if Gui: Gui.updateGui()
+
+update(0)
+if Gui:
+    Gui.activeDocument().activeView().viewAxonometric(); Gui.activeDocument().activeView().fitAll()
+for a in range(0,361,3):
+    update(a); time.sleep(.025)
+print("Pebble V2.3 360-degree sweep complete.")
