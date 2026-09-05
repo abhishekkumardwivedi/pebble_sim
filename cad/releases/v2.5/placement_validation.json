@@ -1,0 +1,14 @@
+{
+  "collisions_mm3": {
+    "shell_vs_FL": 0.0,
+    "shell_vs_FR": 0.0,
+    "shell_vs_RL": 0.0,
+    "shell_vs_RR": 0.0,
+    "FL_vs_FR": 0.0,
+    "FL_vs_RL": 0.0,
+    "FL_vs_RR": 0.0,
+    "FR_vs_RL": 0.0,
+    "FR_vs_RR": 0.0,
+    "RL_vs_RR": 0.0
+  }
+}
