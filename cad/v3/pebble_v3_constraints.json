@@ -1,0 +1,122 @@
+{
+  "version": "3.0-packaging-baseline",
+  "coordinate_system": {
+    "x": "front(+)/rear(-)",
+    "y": "left(+)/right(-)",
+    "z": "up(+), floor=0"
+  },
+  "external_envelope_mm": {
+    "body_width_y": 165,
+    "body_depth_x": 150,
+    "body_shell_height_z": 145,
+    "overall_height_with_antennas": 170,
+    "nominal_belly_ground_clearance": 8,
+    "target_footprint_x": 120,
+    "target_footprint_y": 115,
+    "shell_wall_prototype": 2.4,
+    "shell_wall_product_target": 2.0
+  },
+  "mass_targets_g": {
+    "target_total": 900,
+    "acceptable_total_min": 800,
+    "acceptable_total_max": 1050,
+    "target_cog_height_max_mm": 55
+  },
+  "battery": {
+    "topology": "2S1P cylindrical Li-ion",
+    "reference_cell": "21700 5.0Ah class",
+    "nominal_voltage_v": 7.2,
+    "full_charge_voltage_v": 8.4,
+    "capacity_ah": 5.0,
+    "nominal_energy_wh": 36.0,
+    "cell_max_envelope_mm": [21.7, 21.7, 70.3],
+    "pack_keepout_mm": [74, 46, 24],
+    "pack_target_position_mm": [0, 0, 29],
+    "bms_current_min_a": 10,
+    "notes": "Place cells horizontally and centrally in the lowest safe volume. Use a protected pack/BMS and a mechanically retained cell cradle; no loose cells."
+  },
+  "compute": {
+    "linux_compute_module_bay": {
+      "reference": "Raspberry Pi CM4/CM5-compatible mechanical envelope",
+      "module_keepout_mm": [55, 40, 7],
+      "custom_carrier_keepout_mm": [68, 55, 12],
+      "preferred_orientation": "vertical behind visor",
+      "notes": "Use external RF antenna or preserve antenna keepout if the on-module antenna is used."
+    },
+    "realtime_mcu": {
+      "reference": "ESP32-S3-WROOM-1",
+      "module_mm": [25.5, 18.0, 3.1],
+      "implementation": "module soldered onto the custom carrier; do not reserve a DevKit board in product CAD",
+      "prototype_devkit_keepout_mm": [63, 26, 15]
+    }
+  },
+  "face_and_io": {
+    "visor_outer_target_mm": [105, 68],
+    "display_module_keepout_mm": [95, 62, 10],
+    "camera_keepout_mm": [25, 25, 18],
+    "speaker_keepout_mm": [42, 42, 14],
+    "microphone_count": 2,
+    "microphone_keepout_each_mm": [10, 10, 8],
+    "usb_c_service_keepout_mm": [16, 12, 10]
+  },
+  "leg_architecture": {
+    "leg_count": 4,
+    "architecture": "independent compact four-bar modules, one geared actuator per leg",
+    "reference_motor": "6V N20-class geared DC motor with encoder",
+    "motor_keepout_each_mm": [40, 14, 14],
+    "motor_nominal_voltage_v": 6.0,
+    "current_simulation_no_load_rpm": 130,
+    "current_simulation_stall_torque_nm": 0.0726,
+    "current_simulation_stall_current_a": 0.36,
+    "product_target_output_stall_torque_min_nm": 0.10,
+    "product_target_encoder_counts_per_output_rev_min": 512,
+    "leg_root_centres_mm": {
+      "front_left": [35, 43, 38],
+      "front_right": [35, -43, 38],
+      "rear_left": [-45, 43, 38],
+      "rear_right": [-45, -43, 38]
+    },
+    "linkage_envelope_each_mm": [52, 26, 40],
+    "foot_visible_envelope_each_mm": [32, 27, 14],
+    "foot_travel_vertical_target_mm": 12,
+    "foot_sweep_fore_aft_target_mm": 18,
+    "hard_rule": "motor, upper linkage, chassis plate and bearings must remain inside the cosmetic body silhouette in all validated poses; only the styled foot and a short concealed neck may exit the shell"
+  },
+  "internal_structure": {
+    "chassis_plane_z_mm": 38,
+    "chassis_thickness_target_mm": 2.0,
+    "preferred_material": "5052/6061 aluminium prototype plate or glass-filled polymer production frame",
+    "bearing_rule": "Do not carry robot radial/impact load directly through a motor gearbox output shaft; use a supported pivot/bearing where the linkage load path demands it."
+  },
+  "power_architecture": {
+    "battery_bus": "2S Li-ion, 6.0-8.4V operating range",
+    "motor_rail": "regulated 6V, >=3A transient capability",
+    "compute_rail": "regulated 5V, >=4A design capability",
+    "logic_rail": "3.3V",
+    "power_board_keepout_mm": [55, 42, 10],
+    "thermal_rule": "compute and regulator heat paths must not dump directly into the battery cradle"
+  },
+  "validation_pose_set": [
+    "neutral_stand",
+    "full_crouch",
+    "maximum_body_raise",
+    "front_left_step_lift",
+    "front_right_step_lift",
+    "rear_left_step_lift",
+    "rear_right_step_lift",
+    "left_lean",
+    "right_lean",
+    "forward_bow",
+    "happy_bounce_extreme",
+    "transport_fold"
+  ],
+  "cad_gates": {
+    "gate_1": "outer silhouette matches concept orthographic targets",
+    "gate_2": "all hard component keepouts fit",
+    "gate_3": "leg swept volumes have >=2mm shell clearance",
+    "gate_4": "zero hard-part collisions across validation pose set",
+    "gate_5": "battery remains below target CoG plane and serviceable",
+    "gate_6": "visor/display/camera fit without flattening the body into a sphere",
+    "gate_7": "shell can close with realistic bosses, fasteners and cable routes"
+  }
+}
