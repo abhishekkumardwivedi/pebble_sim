@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+pebble_env/
+
+# If a venv was accidentally created directly in the repository root
+/Lib/
+/Scripts/
+/Include/
+/pyvenv.cfg
+
+# Packaging/build output
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Simulation-generated output
+results/
+logs/
+*.log
+*.mjb
+*.tmp
+*.temp
+*.prof
+*.trace
+
+# Local configuration / secrets
+.env
+.env.*
+!.env.example
+
+# IDE/editor
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Keep models/pebble.xml in Git for reproducibility/review.
