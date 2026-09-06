@@ -1,0 +1,82 @@
+{
+  "revision": "V3-E Motion Proof 1",
+  "units": {"length": "mm", "angle": "deg", "time": "s"},
+  "coordinate_system": {"x": "front", "y": "left", "z": "up", "floor_z_mm": 0.0},
+  "body": {
+    "nominal_width_mm": 165.0,
+    "nominal_depth_mm": 150.0,
+    "shell_belly_z_mm": 8.0,
+    "shell_top_z_mm": 138.0,
+    "overall_top_with_antennas_mm": 170.0,
+    "target_total_mass_kg": 0.90,
+    "target_cog_body_mm": [0.0, 0.0, 43.0]
+  },
+  "fourbar": {
+    "crank_r_mm": 4.0,
+    "frame_d_mm": 17.0,
+    "coupler_l_mm": 34.0,
+    "rocker_q_mm": 22.0,
+    "foot_extension_mm": 8.0,
+    "leg_root_z_mm": 35.5,
+    "front_root_x_mm": 18.0,
+    "leg_y_mm": 44.0,
+    "crank_limits_deg": [175.0, 335.0]
+  },
+  "splay": {
+    "limits_deg": [-18.0, 20.0],
+    "front_servo_center_mm": [31.0, 0.0, 37.0],
+    "rear_servo_center_mm": [-38.0, 0.0, 37.0]
+  },
+  "main_motor": {
+    "type": "N20-class 6V encoder gearmotor",
+    "count": 4,
+    "body_length_mm": 34.0,
+    "body_cross_section_mm": [12.0, 10.0],
+    "shaft_diameter_mm": 3.0,
+    "shaft_visible_length_mm": 6.0,
+    "mass_g_each": 14.0,
+    "nominal_voltage_v": 6.0,
+    "no_load_speed_rpm": 130.0,
+    "expression_loaded_speed_limit_rpm": 85.0,
+    "stall_torque_nm_baseline": 0.0726,
+    "stall_current_a_baseline": 0.36,
+    "no_load_current_a_baseline": 0.04,
+    "product_target_stall_torque_nm_min": 0.10,
+    "note": "Dimensions include an encoder-cap allowance. Torque/current are the current simulation baseline until a final vendor motor is selected."
+  },
+  "splay_motor": {
+    "type": "metal-gear digital micro servo class",
+    "count": 2,
+    "envelope_mm": [23.5, 12.0, 24.0],
+    "mass_g_each": 12.0,
+    "nominal_voltage_v": 6.0,
+    "travel_deg": 40.0,
+    "speed_s_per_60deg": 0.12,
+    "speed_limit_deg_s": 500.0,
+    "stall_torque_nm": 0.18,
+    "note": "One servo mechanically couples the left/right cassettes of each axle through a mirrored bell-crank/tie-rod mechanism."
+  },
+  "passive_paw": {
+    "ankle_roll_pitch_allowance_deg": 8.0,
+    "purpose": "keep the cosmetic paw flat during body roll/pitch and absorb small impact/contact errors"
+  },
+  "expressions": {
+    "sleepy_crouch": {"FL": 330.0, "FR": 330.0, "RL": 330.0, "RR": 330.0, "front_splay": -15.0, "rear_splay": -14.0, "transition_s": 1.00, "hold_s": 0.45},
+    "neutral": {"FL": 296.0, "FR": 296.0, "RL": 296.0, "RR": 296.0, "front_splay": 0.0, "rear_splay": 0.0, "transition_s": 0.70, "hold_s": 0.35},
+    "alert": {"FL": 242.0, "FR": 242.0, "RL": 242.0, "RR": 242.0, "front_splay": 6.0, "rear_splay": 5.0, "transition_s": 0.55, "hold_s": 0.45},
+    "happy_wide": {"FL": 205.0, "FR": 205.0, "RL": 205.0, "RR": 205.0, "front_splay": 18.0, "rear_splay": 17.0, "transition_s": 0.55, "hold_s": 0.45},
+    "bounce_peak": {"FL": 180.0, "FR": 180.0, "RL": 180.0, "RR": 180.0, "front_splay": 18.0, "rear_splay": 17.0, "transition_s": 0.23, "hold_s": 0.08},
+    "play_bow": {"FL": 326.0, "FR": 326.0, "RL": 246.0, "RR": 246.0, "front_splay": 18.0, "rear_splay": 6.0, "transition_s": 0.75, "hold_s": 0.55},
+    "curious_left": {"FL": 322.0, "FR": 252.0, "RL": 318.0, "RR": 250.0, "front_splay": 4.0, "rear_splay": 2.0, "transition_s": 0.65, "hold_s": 0.55},
+    "curious_right": {"FL": 252.0, "FR": 322.0, "RL": 250.0, "RR": 318.0, "front_splay": 4.0, "rear_splay": 2.0, "transition_s": 0.65, "hold_s": 0.55},
+    "wide_flat": {"FL": 300.0, "FR": 300.0, "RL": 300.0, "RR": 300.0, "front_splay": 20.0, "rear_splay": 20.0, "transition_s": 0.70, "hold_s": 0.45},
+    "inward_compact": {"FL": 315.0, "FR": 315.0, "RL": 315.0, "RR": 315.0, "front_splay": -18.0, "rear_splay": -18.0, "transition_s": 0.85, "hold_s": 0.55},
+    "walk_diagonal": {"FL": 270.0, "FR": 315.0, "RL": 315.0, "RR": 270.0, "front_splay": 3.0, "rear_splay": 2.0, "transition_s": 0.55, "hold_s": 0.35}
+  },
+  "demo_sequence": [
+    "neutral", "sleepy_crouch", "neutral", "alert", "neutral",
+    "curious_left", "neutral", "happy_wide", "bounce_peak", "happy_wide",
+    "bounce_peak", "happy_wide", "play_bow", "neutral", "inward_compact",
+    "neutral", "walk_diagonal", "neutral"
+  ]
+}
