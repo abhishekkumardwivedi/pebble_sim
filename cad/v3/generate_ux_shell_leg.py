@@ -12,12 +12,12 @@ OUT = Path(os.environ.get("PEBBLE_CAD_OUT", Path(__file__).resolve().parent / "g
 OUT.mkdir(parents=True, exist_ok=True)
 
 # -----------------------------------------------------------------------------
-# Pebble V3 UX geometry baseline — revision B
+# Pebble V3 UX geometry baseline — revision C
 # Reference priorities:
 #   1. 165 x 150 mm footprint-class body proportions
 #   2. 170 mm overall height INCLUDING antenna tips
 #   3. squat bubble/pebble shell (~130 mm shell height above 8 mm belly plane)
-#   4. face/visor reaches close to forehead and leaves a smaller lower white chin
+#   4. face/visor reaches close to forehead, gently flares through lower cheeks
 #   5. soft pebble/paw feet, mostly tucked under shell
 # -----------------------------------------------------------------------------
 BODY_TARGET_WIDTH_Y = 165.0
@@ -28,8 +28,8 @@ OVERALL_TOP_Z = 170.0
 SHELL_WALL = 2.4
 
 # Horizontal section controls: (z, front_x, rear_x, half_width_y, exponent)
-# Revision B removes the long near-constant-width band that made V3-A look cubic.
-# Max width/depth now occurs around the lower-middle and the crown rolls inward early.
+# Revision B removed the long near-constant-width band that made V3-A look cubic.
+# Max width/depth occurs around the lower-middle and the crown rolls inward early.
 BODY_SECTIONS = [
     (8.0,   47.0, 45.0, 54.0, 2.04),
     (15.0,  56.0, 54.0, 63.0, 2.03),
@@ -103,8 +103,9 @@ def pebble_face_wire(
 ) -> cq.Wire:
     """Organic visor profile in the global Y-Z plane.
 
-    The top is broad and forehead-hugging; lower corners pull in a little more
-    strongly than a rounded rectangle. This is intentionally not a rect+fillet.
+    Revision C keeps the forehead slightly narrower, then lets the lower-middle
+    flare outward to follow the shell cheek curvature before tucking into a
+    soft bowed lower edge. This avoids a rounded-rectangle / flat-panel read.
     """
     w = half_w * scale
     th = top_h * scale
@@ -112,23 +113,25 @@ def pebble_face_wire(
 
     yz = [
         (0.00, +1.00 * th),
-        (+0.42 * w, +0.97 * th),
-        (+0.72 * w, +0.82 * th),
-        (+0.91 * w, +0.55 * th),
-        (+1.00 * w, +0.15 * th),
-        (+0.98 * w, -0.30 * bh),
-        (+0.88 * w, -0.62 * bh),
-        (+0.66 * w, -0.86 * bh),
-        (+0.34 * w, -0.98 * bh),
+        (+0.39 * w, +0.97 * th),
+        (+0.68 * w, +0.83 * th),
+        (+0.88 * w, +0.57 * th),
+        (+0.97 * w, +0.22 * th),
+        (+1.02 * w, -0.18 * bh),
+        (+1.03 * w, -0.43 * bh),
+        (+0.96 * w, -0.66 * bh),
+        (+0.76 * w, -0.86 * bh),
+        (+0.39 * w, -0.98 * bh),
         (0.00, -1.00 * bh),
-        (-0.34 * w, -0.98 * bh),
-        (-0.66 * w, -0.86 * bh),
-        (-0.88 * w, -0.62 * bh),
-        (-0.98 * w, -0.30 * bh),
-        (-1.00 * w, +0.15 * th),
-        (-0.91 * w, +0.55 * th),
-        (-0.72 * w, +0.82 * th),
-        (-0.42 * w, +0.97 * th),
+        (-0.39 * w, -0.98 * bh),
+        (-0.76 * w, -0.86 * bh),
+        (-0.96 * w, -0.66 * bh),
+        (-1.03 * w, -0.43 * bh),
+        (-1.02 * w, -0.18 * bh),
+        (-0.97 * w, +0.22 * th),
+        (-0.88 * w, +0.57 * th),
+        (-0.68 * w, +0.83 * th),
+        (-0.39 * w, +0.97 * th),
     ]
     pts = [cq.Vector(x, y, center_z + dz) for y, dz in yz]
     edge = cq.Edge.makeSpline(pts, periodic=True)
@@ -157,7 +160,6 @@ def make_body_shell() -> Tuple[cq.Shape, cq.Shape]:
     inner = cq.Solid.makeLoft(inner_wires, ruled=False)
     shell = outer.cut(inner)
 
-    # Organic face recess slightly larger than the insert.
     recess_wire = pebble_face_wire(
         VISOR_MASK_X,
         VISOR_CENTER_Z,
@@ -190,11 +192,7 @@ def ellipse_wire_at(x: float, y: float, z: float, rx: float, ry: float) -> cq.Wi
 
 
 def pebble_foot(x: float, y: float, scale: float = 1.0) -> cq.Shape:
-    """Soft paw/pebble foot with a domed top and a compact visual footprint.
-
-    Upper sections shift slightly toward the body center so the foot visually
-    disappears into the belly rather than reading as a separate flat puck.
-    """
+    """Soft paw/pebble foot with a domed top and compact visual footprint."""
     y_in = -math.copysign(1.8, y)
     x_in = -math.copysign(1.0, x)
 
@@ -228,8 +226,6 @@ def cylinder_between(
 
 
 def antenna(sign: float) -> Tuple[cq.Shape, cq.Shape]:
-    # Taller, softer-looking antenna because 170 mm is the overall robot height,
-    # not the body-shell height.
     pts = [
         (0.0, sign * 21.0, 133.0),
         (0.2, sign * 23.0, 141.0),
@@ -318,9 +314,6 @@ def build_assembly() -> Tuple[cq.Assembly, Dict[str, cq.Shape], np.ndarray]:
     aL, tipL = antenna(+1.0)
     aR, tipR = antenna(-1.0)
 
-    # Precompute neutral legs, then cut only shallow cosmetic foot-reveal pockets.
-    # This is not yet the final swept-motion opening; it simply prevents the shell
-    # from visually swallowing the paw geometry in the UX review.
     leg_cache: Dict[str, Dict[str, object]] = {}
     for front in (True, False):
         for left in (True, False):
@@ -345,7 +338,7 @@ def build_assembly() -> Tuple[cq.Assembly, Dict[str, cq.Shape], np.ndarray]:
         "tip_right": tipR,
     }
 
-    asm = cq.Assembly(name="Pebble_V3B_UX_Shell_Leg_Concept")
+    asm = cq.Assembly(name="Pebble_V3C_UX_Shell_Leg_Concept")
     asm.add(shell, name="shell", color=cq.Color(0.93, 0.90, 0.84))
     asm.add(visor, name="visor", color=cq.Color(0.035, 0.04, 0.05))
     asm.add(aL, name="antenna_left", color=cq.Color(0.10, 0.10, 0.11))
@@ -380,10 +373,10 @@ def build_assembly() -> Tuple[cq.Assembly, Dict[str, cq.Shape], np.ndarray]:
 def main() -> None:
     asm, components, traj = build_assembly()
 
-    step_path = OUT / "Pebble_V3B_UX_Shell_Leg_Concept.step"
+    step_path = OUT / "Pebble_V3C_UX_Shell_Leg_Concept.step"
     asm.save(str(step_path), exportType="STEP", mode="default")
 
-    ext = cq.Assembly(name="Pebble_V3B_UX_Exterior")
+    ext = cq.Assembly(name="Pebble_V3C_UX_Exterior")
     for name in (
         "shell",
         "visor",
@@ -409,11 +402,11 @@ def main() -> None:
             color = cq.Color(0.84, 0.82, 0.78)
         ext.add(shape, name=name, color=color)
 
-    ext_path = OUT / "Pebble_V3B_UX_Exterior.step"
+    ext_path = OUT / "Pebble_V3C_UX_Exterior.step"
     ext.save(str(ext_path), exportType="STEP", mode="default")
 
     np.savetxt(
-        OUT / "Pebble_V3B_FrontLeft_FootTrajectory.csv",
+        OUT / "Pebble_V3C_FrontLeft_FootTrajectory.csv",
         traj,
         delimiter=",",
         header="x_mm,y_mm,z_mm",
