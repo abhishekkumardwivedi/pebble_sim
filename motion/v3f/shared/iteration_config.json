@@ -1,0 +1,74 @@
+{
+  "quick_sentinel_poses": [
+    "sleepy_compact",
+    "happy_wide",
+    "play_bow",
+    "curious_left"
+  ],
+  "full_pose_set": [
+    "sleepy_compact",
+    "neutral",
+    "alert",
+    "happy_wide",
+    "play_bow",
+    "curious_left",
+    "curious_right",
+    "walk_diagonal"
+  ],
+  "transitions": [
+    {
+      "name": "settle_to_sleepy",
+      "from": "neutral",
+      "to": "sleepy_compact",
+      "duration_s": 1.4
+    },
+    {
+      "name": "happy_open",
+      "from": "neutral",
+      "to": "happy_wide",
+      "duration_s": 0.55
+    },
+    {
+      "name": "play_bow",
+      "from": "neutral",
+      "to": "play_bow",
+      "duration_s": 0.7
+    },
+    {
+      "name": "curious_left",
+      "from": "neutral",
+      "to": "curious_left",
+      "duration_s": 0.6
+    }
+  ],
+  "validation_targets": {
+    "minimum_static_clearance_mm": 1.5,
+    "minimum_preferred_clearance_mm": 2.0,
+    "shell_slot_margin_each_side_mm": 3.0,
+    "nominal_sleepy_belly_clearance_mm": 8.0
+  },
+  "render": {
+    "image_size_px": [
+      720,
+      640
+    ],
+    "views": [
+      "isometric",
+      "front",
+      "side"
+    ],
+    "grid_spacing_mm": 20
+  },
+  "deferred": [
+    "mujoco_dynamics",
+    "electronics_packaging",
+    "full_bom_sourcing",
+    "production_dfm",
+    "controller_firmware"
+  ],
+  "motion_preview_transitions": [
+    "happy_open",
+    "curious_left"
+  ],
+  "motion_review_frames": 7
+}
