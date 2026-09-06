@@ -1,0 +1,168 @@
+# Pebble V3-E Motion Proof — FreeCAD kinematic animation
+#
+# This macro is intentionally kinematic, not a rigid-body/contact simulation.
+# It uses the same motion_spec.json geometry, motor limits and expression timings
+# as the MuJoCo preview. Use it to inspect packaging, interference and character.
+
+import FreeCAD as App
+import FreeCADGui as Gui
+import Part
+import Import
+import json
+import math
+import os
+import time
+
+TIME_SCALE = 1.0
+LOOP = True
+SHELL_TRANSPARENCY = 68
+FPS = 20.0
+LEG_ORDER = ("FL", "FR", "RL", "RR")
+
+HERE = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
+ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
+SPEC_PATH = os.path.join(ROOT, 'shared', 'motion_spec.json')
+BODY_STEP = os.path.join(ROOT, 'cad', 'generated', 'Pebble_V3E_Body.step')
+
+with open(SPEC_PATH, 'r') as f:
+    SPEC = json.load(f)
+
+
+def fourbar(theta_deg, front, left, splay_deg=0.0):
+    g = SPEC['fourbar']
+    r, d, l, q, e = [float(g[k]) for k in ('crank_r_mm','frame_d_mm','coupler_l_mm','rocker_q_mm','foot_extension_mm')]
+    th = math.radians(float(theta_deg))
+    B2 = (r*math.cos(th), r*math.sin(th)); D2 = (d, 0.0)
+    vx, vz = D2[0]-B2[0], D2[1]-B2[1]; dist = math.hypot(vx, vz)
+    aa = (l*l-q*q+dist*dist)/(2.0*dist); hh = math.sqrt(max(0.0, l*l-aa*aa))
+    p0x, p0z = B2[0]+aa*vx/dist, B2[1]+aa*vz/dist
+    C2 = (p0x + hh*vz/dist, p0z - hh*vx/dist)
+    ux, uz = (C2[0]-D2[0])/q, (C2[1]-D2[1])/q
+    P2 = (C2[0]+e*ux, C2[1]+e*uz)
+    xsign = 1.0 if front else -1.0
+    y = float(g['leg_y_mm']) if left else -float(g['leg_y_mm'])
+    ax = xsign*float(g['front_root_x_mm']); z0=float(g['leg_root_z_mm'])
+    def mp(v): return (ax+xsign*v[0], y, z0+v[1])
+    A0,B0,C0,D0,P0=[mp(v) for v in ((0,0),B2,C2,D2,P2)]
+    phi=math.radians(float(splay_deg)*(1.0 if left else -1.0))
+    def rx(p):
+        x,yy,zz=p[0]-A0[0],p[1]-A0[1],p[2]-A0[2]
+        return (A0[0]+x,A0[1]+yy*math.cos(phi)-zz*math.sin(phi),A0[2]+yy*math.sin(phi)+zz*math.cos(phi))
+    A,B,C,D,P=[rx(v) for v in (A0,B0,C0,D0,P0)]
+    return {'A':A,'B':B,'C':C,'D':D,'P':P}
+
+
+def solve_body(pose):
+    ankle_ref = fourbar(SPEC['expressions']['sleepy_crouch']['FL'], True, True, 0.0)['P'][2]
+    rows=[]; rhs=[]
+    for tag in LEG_ORDER:
+        front=tag.startswith('F'); left=tag.endswith('L'); s=pose['front_splay'] if front else pose['rear_splay']
+        x,y,z=fourbar(pose[tag],front,left,s)['P']; rows.append((x,y,1.0)); rhs.append(ankle_ref-z)
+    ata=[[0.0]*3 for _ in range(3)]; atb=[0.0]*3
+    for r,h in zip(rows,rhs):
+        for i in range(3):
+            atb[i]+=r[i]*h
+            for j in range(3): ata[i][j]+=r[i]*r[j]
+    m=[ata[i][:]+[atb[i]] for i in range(3)]
+    for i in range(3):
+        piv=max(range(i,3),key=lambda k:abs(m[k][i])); m[i],m[piv]=m[piv],m[i]
+        den=m[i][i] if abs(m[i][i])>1e-12 else 1e-12
+        for j in range(i,4): m[i][j]/=den
+        for k in range(3):
+            if k==i: continue
+            f=m[k][i]
+            for j in range(i,4): m[k][j]-=f*m[i][j]
+    a,b,c=[m[i][3] for i in range(3)]
+    return {'roll':math.degrees(math.atan(b)),'pitch':math.degrees(math.atan(-a)),'dz':c}
+
+
+def smooth5(u):
+    u=max(0.0,min(1.0,float(u))); return u*u*u*(10-15*u+6*u*u)
+
+
+def transition_duration(a,b,requested):
+    main_v=float(SPEC['main_motor']['expression_loaded_speed_limit_rpm'])*6.0
+    splay_v=float(SPEC['splay_motor']['speed_limit_deg_s']); need=0.0
+    for k in LEG_ORDER: need=max(need,1.875*abs(b[k]-a[k])/main_v)
+    for k in ('front_splay','rear_splay'): need=max(need,1.875*abs(b[k]-a[k])/splay_v)
+    return max(float(requested),need)
+
+
+def interp(a,b,u):
+    s=smooth5(u); return {k:float(a[k])+(float(b[k])-float(a[k]))*s for k in LEG_ORDER+('front_splay','rear_splay')}
+
+
+def body_rotation(body):
+    rr=App.Rotation(App.Vector(1,0,0),body['roll'])
+    rp=App.Rotation(App.Vector(0,1,0),body['pitch'])
+    return rp.multiply(rr)
+
+
+def world_point(p, body):
+    v=body_rotation(body).multVec(App.Vector(*p)); return App.Vector(v.x,v.y,v.z+body['dz'])
+
+
+def cylinder_between(a,b,r):
+    v=b.sub(a); L=v.Length
+    if L<1e-9: return Part.makeSphere(r,a)
+    d=App.Vector(v); d.normalize(); return Part.makeCylinder(r,L,a,d)
+
+
+def ensure_feature(doc,name,color,transparency=0):
+    obj=doc.getObject(name) or doc.addObject('Part::Feature',name)
+    obj.ViewObject.ShapeColor=color; obj.ViewObject.Transparency=transparency
+    return obj
+
+doc=App.newDocument('Pebble_V3E_Motion') if App.ActiveDocument is None else App.ActiveDocument
+before=set(o.Name for o in doc.Objects)
+Import.insert(BODY_STEP,doc.Name)
+body_objs=[o for o in doc.Objects if o.Name not in before]
+for o in body_objs:
+    o.ViewObject.Transparency=SHELL_TRANSPARENCY if 'shell' in o.Label.lower() else 0
+
+parts={}
+for tag in LEG_ORDER:
+    parts[tag]={}
+    for i in range(4): parts[tag]['link'+str(i)]=ensure_feature(doc,'Link_'+tag+'_'+str(i),(0.62,0.64,0.66))
+    parts[tag]['motor']=ensure_feature(doc,'Motor_'+tag,(0.36,0.38,0.40))
+    parts[tag]['shaft']=ensure_feature(doc,'Shaft_'+tag,(0.78,0.78,0.78))
+    parts[tag]['paw']=ensure_feature(doc,'Paw_'+tag,(0.84,0.82,0.78))
+for axle in ('Front','Rear'):
+    parts[axle]={}
+    parts[axle]['servo']=ensure_feature(doc,axle+'_Splay_Servo',(0.16,0.18,0.20))
+    parts[axle]['horn']=ensure_feature(doc,axle+'_Splay_Horn',(0.82,0.82,0.80))
+
+
+def update_scene(label,pose):
+    body=solve_body(pose); rot=body_rotation(body); placement=App.Placement(App.Vector(0,0,body['dz']),rot)
+    for o in body_objs: o.Placement=placement
+    for tag in LEG_ORDER:
+        front=tag.startswith('F'); left=tag.endswith('L'); s=pose['front_splay'] if front else pose['rear_splay']
+        leg=fourbar(pose[tag],front,left,s)
+        A,B,C,D,P=[world_point(leg[k],body) for k in ('A','B','C','D','P')]
+        for i,(p0,p1) in enumerate(((A,B),(B,C),(D,C),(C,P))): parts[tag]['link'+str(i)].Shape=cylinder_between(p0,p1,2.2)
+        sign=1.0 if left else -1.0; length=float(SPEC['main_motor']['body_length_mm'])
+        A0=fourbar(pose[tag],front,left,0.0)['A']; c=(A0[0],A0[1]-sign*length/2.0,A0[2])
+        cornershape=Part.makeBox(12.0,length,10.0,App.Vector(c[0]-6.0,c[1]-length/2.0,c[2]-5.0))
+        cornershape.Placement=placement
+        parts[tag]['motor'].Shape=cornershape
+        parts[tag]['shaft'].Shape=cylinder_between(A, world_point((leg['A'][0],leg['A'][1]+sign*6.0,leg['A'][2]),body),1.5)
+        parts[tag]['paw'].Shape=Part.makeSphere(7.5,App.Vector(P.x,P.y,7.0))
+    for front,axle,key in ((True,'Front','front_splay'),(False,'Rear','rear_splay')):
+        cx,cy,cz=SPEC['splay']['front_servo_center_mm' if front else 'rear_servo_center_mm']; center=world_point((cx,cy,cz),body)
+        parts[axle]['servo'].Shape=Part.makeBox(23.5,12.0,24.0,App.Vector(center.x-11.75,center.y-6.0,center.z-12.0))
+        ang=math.radians(pose[key]); horn0=world_point((cx,cy,cz+13.2),body)
+        local_end=(cx+11.0*math.cos(ang),cy+11.0*math.sin(ang),cz+13.2); horn1=world_point(local_end,body)
+        parts[axle]['horn'].Shape=cylinder_between(horn0,horn1,1.8)
+    doc.recompute()
+    App.Console.PrintMessage('Pebble expression: %s  roll=%+.1f pitch=%+.1f belly=%.1f mm\n' % (label,body['roll'],body['pitch'],SPEC['body']['shell_belly_z_mm']+body['dz']))
+
+expr=SPEC['expressions']; seq=SPEC['demo_sequence']
+while True:
+    cur=expr[seq[0]]; update_scene(seq[0],cur); time.sleep(float(cur.get('hold_s',0.3))/TIME_SCALE)
+    for name in seq[1:]:
+        target=expr[name]; T=transition_duration(cur,target,target.get('transition_s',0.6)); n=max(2,int(round(T*FPS)))
+        for i in range(1,n+1):
+            update_scene(name,interp(cur,target,float(i)/n)); Gui.updateGui(); time.sleep((T/n)/TIME_SCALE)
+        time.sleep(float(target.get('hold_s',0.3))/TIME_SCALE); cur=target
+    if not LOOP: break
