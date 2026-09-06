@@ -1,0 +1,83 @@
+<mujoco model="Pebble_V3F">
+  <compiler angle="degree" coordinate="local"/>
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast"/>
+  <default>
+    <geom friction="0.9 0.02 0.002" condim="4"/>
+    <joint damping="0.02" armature="0.00002"/>
+  </default>
+
+  <worldbody>
+    <geom name="floor" type="plane" size="2 2 0.1" rgba="0.82 0.82 0.82 1"/>
+    <body name="pebble" pos="0 0 0.060">
+      <freejoint name="pebble_free"/>
+      <inertial pos="0 0 0.045" mass="0.90" diaginertia="0.0018 0.0020 0.0022"/>
+      <geom name="body_collision" type="ellipsoid" size="0.074 0.081 0.060" pos="0 0 0.070" rgba="0.93 0.90 0.84 0.25"/>
+
+      <body name="cassette_FL" pos="0.018 0.043 0.048">
+        <joint name="splay_FL" type="hinge" axis="1 0 0" range="-10 10" damping="0.05"/>
+        <geom name="cassette_FL_geom" type="box" size="0.021 0.008 0.015" rgba="0.25 0.28 0.32 1"/>
+        <body name="crank_body_FL" pos="0 0 -0.0115">
+          <joint name="crank_FL" type="hinge" axis="0 1 0" range="220 310" damping="0.015"/>
+          <geom type="cylinder" size="0.006 0.002" quat="0.7071 0.7071 0 0" rgba="0.72 0.60 0.22 1"/>
+        </body>
+        <body name="paw_proxy_FL" pos="0.040 0 -0.040">
+          <joint name="shock_FL" type="slide" axis="0 0 1" range="0 0.005" stiffness="10000" damping="25"/>
+          <geom name="paw_FL" type="ellipsoid" size="0.012 0.010 0.008" rgba="0.85 0.83 0.80 1"/>
+        </body>
+      </body>
+
+      <body name="cassette_FR" pos="0.018 -0.043 0.048">
+        <joint name="splay_FR" type="hinge" axis="1 0 0" range="-10 10" damping="0.05"/>
+        <geom name="cassette_FR_geom" type="box" size="0.021 0.008 0.015" rgba="0.25 0.28 0.32 1"/>
+        <body name="crank_body_FR" pos="0 0 -0.0115">
+          <joint name="crank_FR" type="hinge" axis="0 1 0" range="220 310" damping="0.015"/>
+          <geom type="cylinder" size="0.006 0.002" quat="0.7071 0.7071 0 0" rgba="0.72 0.60 0.22 1"/>
+        </body>
+        <body name="paw_proxy_FR" pos="0.040 0 -0.040">
+          <joint name="shock_FR" type="slide" axis="0 0 1" range="0 0.005" stiffness="10000" damping="25"/>
+          <geom name="paw_FR" type="ellipsoid" size="0.012 0.010 0.008" rgba="0.85 0.83 0.80 1"/>
+        </body>
+      </body>
+
+      <body name="cassette_RL" pos="-0.018 0.043 0.048">
+        <joint name="splay_RL" type="hinge" axis="1 0 0" range="-10 10" damping="0.05"/>
+        <geom name="cassette_RL_geom" type="box" size="0.021 0.008 0.015" rgba="0.25 0.28 0.32 1"/>
+        <body name="crank_body_RL" pos="0 0 -0.0115">
+          <joint name="crank_RL" type="hinge" axis="0 1 0" range="220 310" damping="0.015"/>
+          <geom type="cylinder" size="0.006 0.002" quat="0.7071 0.7071 0 0" rgba="0.72 0.60 0.22 1"/>
+        </body>
+        <body name="paw_proxy_RL" pos="-0.040 0 -0.040">
+          <joint name="shock_RL" type="slide" axis="0 0 1" range="0 0.005" stiffness="10000" damping="25"/>
+          <geom name="paw_RL" type="ellipsoid" size="0.012 0.010 0.008" rgba="0.85 0.83 0.80 1"/>
+        </body>
+      </body>
+
+      <body name="cassette_RR" pos="-0.018 -0.043 0.048">
+        <joint name="splay_RR" type="hinge" axis="1 0 0" range="-10 10" damping="0.05"/>
+        <geom name="cassette_RR_geom" type="box" size="0.021 0.008 0.015" rgba="0.25 0.28 0.32 1"/>
+        <body name="crank_body_RR" pos="0 0 -0.0115">
+          <joint name="crank_RR" type="hinge" axis="0 1 0" range="220 310" damping="0.015"/>
+          <geom type="cylinder" size="0.006 0.002" quat="0.7071 0.7071 0 0" rgba="0.72 0.60 0.22 1"/>
+        </body>
+        <body name="paw_proxy_RR" pos="-0.040 0 -0.040">
+          <joint name="shock_RR" type="slide" axis="0 0 1" range="0 0.005" stiffness="10000" damping="25"/>
+          <geom name="paw_RR" type="ellipsoid" size="0.012 0.010 0.008" rgba="0.85 0.83 0.80 1"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <equality>
+    <joint name="mirror_front_splay" joint1="splay_FR" joint2="splay_FL" polycoef="0 -1 0 0 0" solref="0.01 1"/>
+    <joint name="mirror_rear_splay" joint1="splay_RR" joint2="splay_RL" polycoef="0 -1 0 0 0" solref="0.01 1"/>
+  </equality>
+
+  <actuator>
+    <motor name="motor_FL" joint="crank_FL" gear="1" ctrlrange="-1 1" ctrllimited="true" forcerange="-0.2354 0.2354" forcelimited="true"/>
+    <motor name="motor_FR" joint="crank_FR" gear="1" ctrlrange="-1 1" ctrllimited="true" forcerange="-0.2354 0.2354" forcelimited="true"/>
+    <motor name="motor_RL" joint="crank_RL" gear="1" ctrlrange="-1 1" ctrllimited="true" forcerange="-0.2354 0.2354" forcelimited="true"/>
+    <motor name="motor_RR" joint="crank_RR" gear="1" ctrlrange="-1 1" ctrllimited="true" forcerange="-0.2354 0.2354" forcelimited="true"/>
+    <position name="splay_front_servo" joint="splay_FL" kp="8" ctrlrange="-0.174533 0.174533" ctrllimited="true" forcerange="-0.2157 0.2157" forcelimited="true"/>
+    <position name="splay_rear_servo" joint="splay_RL" kp="8" ctrlrange="-0.174533 0.174533" ctrllimited="true" forcerange="-0.2157 0.2157" forcelimited="true"/>
+  </actuator>
+</mujoco>
