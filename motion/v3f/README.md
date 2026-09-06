@@ -1,47 +1,72 @@
-# Pebble V3-F — Mechanically Resolved Six-Motor Architecture
+# Pebble V3-F — Mechanical CAD Validation Loop
 
-V3-F addresses the main weaknesses found in V3-E: floating cosmetic paws, undefined connection of the two splay motors, excessive shell-opening uncertainty, and impact loads passing too directly through small actuator gearboxes.
+V3-F is now focused on **mechanical CAD validation for expression/personality, clearance and load path**. MuJoCo, electronics packaging, detailed BOM work and controller implementation are deliberately deferred until the mechanism is mechanically convincing.
 
 ## Source of truth
 
-- `cad/generate_v3f.py` — parametric CadQuery generator for the V3-F mechanical review assemblies.
-- `shared/v3f_mechanical_spec.json` — motor, linkage, spring, material and expression parameters.
-- `docs/V3F_MECHANICAL_ARCHITECTURE.md` — mechanical/load-path explanation.
-- `validation/V3F_CLEARANCE_AND_LOADPATH.json` — current swept-volume and overload targets.
-- `freecad/Pebble_V3F_Review.FCMacro` — FreeCAD review helper.
-- `mujoco/pebble_v3f.xml` — MuJoCo V3-F physics scaffold.
-- `mujoco/simulate_v3f.py` — expression playback / simulation bridge.
-- `releases/V3F_GENERATED_ARTIFACTS.md` — checksums for the generated STEP review files.
+- `cad/generate_v3f.py` — parametric V3-F CAD generator.
+- `shared/v3f_mechanical_spec.json` — motor, linkage, spring, material and named pose parameters.
+- `shared/iteration_config.json` — sentinel poses, short review transitions, render and clearance policy.
+- `shared/baseline_metrics.json` — frozen current-version regression baseline for delta reporting.
+- `tools/validate_v3f.py` — fast kinematic/workspace/load-path regression.
+- `tools/render_step.py` — deterministic CAD/STEP endpoint renders; no image-generation model.
+- `tools/render_motion.py` — short CAD-derived expression clips. Each frame injects interpolated actuator targets into the parametric CAD generator and rebuilds the actual solids.
+- `tools/run_iteration.py` — one-command iteration loop.
+- `validation/` — earlier V3-F clearance/load-path record.
+- `freecad/Pebble_V3F_Review.FCMacro` — optional FreeCAD review helper.
 
-## CAD
+## Normal iteration
 
-Install the existing project CAD dependencies, then from the repository root:
-
-```bash
-python motion/v3f/cad/generate_v3f.py
-```
-
-Generated STEP review files are written under `motion/v3f/cad/generated/` by default. Generated STEP files are intentionally not treated as source code; regenerate them from the committed parametric model.
-
-## FreeCAD
-
-Open the generated neutral/cutaway STEP and use `freecad/Pebble_V3F_Review.FCMacro` for review. FreeCAD is used for mechanism/clearance visualization, not for final contact physics.
-
-## MuJoCo
+From the repository root:
 
 ```bash
-pip install mujoco numpy
-python motion/v3f/mujoco/simulate_v3f.py --demo
+python motion/v3f/tools/run_iteration.py
 ```
 
-The current MuJoCo file is a physics scaffold for the six-actuator architecture. Dynamic torque, contact, friction and overload validation remain an engineering gate before manufacturing.
+This regenerates the CAD, runs the fast regression, renders the sentinel endpoint poses and renders the two short review motions configured in `iteration_config.json`.
 
-## Current actuator baseline
+For a structural-only tweak where motion images are unnecessary:
 
-- 4 x GA12/N20 6 V ~150 RPM encoder gearmotors, externally reduced 12T:18T to the crank shaft.
-- 2 x MG90S metal-gear micro servos for front/rear mirrored splay.
-- 2 x 623ZZ-class support bearings per crank shaft.
-- twin preloaded cassette springs per leg plus structural hard stops into the belly ring.
-- spring-loaded servo-saver sections in the front/rear splay pushrods.
+```bash
+python motion/v3f/tools/run_iteration.py --skip-motion
+```
 
-V3-F is **simulation-ready architecture**, not production qualification. Final motor lot, spring rate, material, fatigue and child/impact load robustness require measured parts, FEA and physical proof testing.
+For review of existing STEP files without regenerating CAD:
+
+```bash
+python motion/v3f/tools/run_iteration.py --skip-cad
+```
+
+Generated outputs live under `motion/v3f/output/` and are disposable; the parameter/specification files above remain the source of truth.
+
+The deterministic render path uses CadQuery/OpenCascade + VTK, with Pillow/imageio for review sheets and GIFs. FreeCAD does not need to be opened manually for routine review.
+
+## Current quick acceptance set
+
+The normal loop intentionally checks only four sentinel expressions on every iteration:
+
+- `sleepy_compact` — tucked-paw/minimum-height envelope.
+- `happy_wide` — large splay / shell-opening envelope.
+- `play_bow` — front/rear differential and pitch.
+- `curious_left` — asymmetric left/right articulation and roll.
+
+Only two short CAD motion previews (`happy_open` and `curious_left`) are generated during a normal review. The full personality suite is reserved for milestones, avoiding repeated regeneration when only one mechanical dimension changes.
+
+## Current mechanical baseline
+
+- 4 × GA12/N20-class 6 V encoder gearmotors.
+- external 12T:18T m0.5 reduction to separately supported 3 mm crank shafts.
+- 2 × MG90S-class metal-gear servos for front/rear mirrored splay.
+- twin preloaded cassette springs per leg + structural hard stops into the belly ring.
+- spring-loaded splay servo-saver path.
+- soft gaiter/paw transition intended to hide the rigid shell aperture.
+
+The quick validator reports analytical ankle workspace, recommended hidden aperture, expression body attitude, spring/hard-stop load path and deltas from the frozen baseline. Exact B-Rep collision sweeps and FEA are separate gates and are run when geometry/load paths change materially rather than on every cosmetic iteration.
+
+## Deliberately not active yet
+
+MuJoCo dynamics, electronics packaging, detailed wiring, full BOM sourcing, firmware/control work and production DFM are deferred. They can be reactivated after CAD motion, clearance, load-path and critical stress checks pass.
+
+## Known open mechanical item
+
+Antenna articulation is not yet physically modeled in V3-F. It remains a required personality DOF and should be added after the current six-actuator leg/body mechanism clears the first CAD regression loop.
