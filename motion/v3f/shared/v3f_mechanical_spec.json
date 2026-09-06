@@ -1,0 +1,64 @@
+{
+  "units": "SI in MuJoCo; CAD parameters mm/deg in JSON",
+  "mass_target_kg": 0.9,
+  "body_com_target_m": [0, 0, 0.045],
+  "main_motor": {
+    "model": "GA12-N20 6V 150RPM encoder",
+    "count": 4,
+    "envelope_mm": [12.0, 32.0, 10.0],
+    "rated_rpm": 120.0,
+    "rated_torque_Nm": 0.0343,
+    "stall_torque_Nm": 0.2354,
+    "external_reduction": 1.5,
+    "crank_rated_rpm": 80.0,
+    "crank_rated_torque_Nm": 0.046305
+  },
+  "splay_servo": {
+    "model": "TowerPro MG90S metal gear",
+    "count": 2,
+    "envelope_mm": [28.5, 22.8, 12.2],
+    "stall_torque_Nm": 0.2157463,
+    "no_load_speed_deg_s": 750.0,
+    "cassette_range_deg": [-10.0, 10.0]
+  },
+  "fourbar_mm": {
+    "crank_r": 5.0,
+    "frame_d": 16.0,
+    "coupler_l": 28.0,
+    "rocker_q": 17.0,
+    "foot_ext": 10.0,
+    "theta_range_deg": [220.0, 310.0]
+  },
+  "overload": {
+    "vertical_travel_mm": 5.0,
+    "spring_count_per_leg": 2,
+    "spring_k_N_per_mm_each": 5.0,
+    "preload_N_each": 2.0,
+    "force_at_hardstop_N_per_leg": 54.0,
+    "note": "hard stop transfers additional load into GF-nylon belly ring/shell bosses, bypassing actuator gearbox"
+  },
+  "splay_servo_saver": {
+    "k_N_per_mm": 2.0,
+    "preload_N": 1.5,
+    "travel_mm": 3.0
+  },
+  "materials": {
+    "crank_shaft": "3mm stainless steel",
+    "links": "2mm 6061-T6 or stamped steel prototype",
+    "crank_gear": "POM 18T m0.5",
+    "motor_pinion": "brass/steel 12T m0.5",
+    "cassette": "GF-nylon or 1.5-2mm 6061",
+    "belly_ring": "30% GF nylon, ~4-5mm section",
+    "gaiter": "Shore 70-85A TPU/TPE"
+  },
+  "pose_targets": {
+    "sleepy_compact": {"FL": 308, "FR": 308, "RL": 308, "RR": 308, "front_splay": -6, "rear_splay": -6},
+    "neutral": {"FL": 290, "FR": 290, "RL": 290, "RR": 290, "front_splay": 0, "rear_splay": 0},
+    "alert": {"FL": 240, "FR": 240, "RL": 240, "RR": 240, "front_splay": 3, "rear_splay": 3},
+    "happy_wide": {"FL": 260, "FR": 260, "RL": 260, "RR": 260, "front_splay": 9, "rear_splay": 9},
+    "play_bow": {"FL": 310, "FR": 310, "RL": 250, "RR": 250, "front_splay": 8, "rear_splay": 3},
+    "curious_left": {"FL": 300, "FR": 260, "RL": 300, "RR": 260, "front_splay": 2, "rear_splay": 2},
+    "curious_right": {"FL": 260, "FR": 300, "RL": 260, "RR": 300, "front_splay": 2, "rear_splay": 2},
+    "walk_diagonal": {"FL": 250, "FR": 300, "RL": 300, "RR": 250, "front_splay": 2, "rear_splay": 2}
+  }
+}
