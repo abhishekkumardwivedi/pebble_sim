@@ -1,0 +1,14 @@
+# Pebble V3-F mechanism review macro
+# Opens STEP snapshots generated from the same v3f_mechanical_spec.json.
+import FreeCAD as App, ImportGui, os, time
+base=os.path.dirname(os.path.realpath(__file__))
+steps=os.path.join(base,'..','cad','generated')
+seq=['Pebble_V3F_Product_Neutral.step','Pebble_V3F_Engineering_Cutaway.step','Pebble_V3F_Happy_Wide.step','Pebble_V3F_Inward_Compact.step','Pebble_V3F_Play_Bow.step','Pebble_V3F_Curious_Left.step']
+for fn in seq:
+    path=os.path.normpath(os.path.join(steps,fn))
+    doc=App.newDocument('V3F_'+fn.replace('.step',''))
+    ImportGui.insert(path,doc.Name)
+    doc.recompute()
+    Gui.activeDocument().activeView().viewAxonometric()
+    Gui.activeDocument().activeView().fitAll()
+    time.sleep(1.2)
