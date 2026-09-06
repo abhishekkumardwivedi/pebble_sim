@@ -1,0 +1,68 @@
+{
+  "workspace": {
+    "ankle_span_x_mm": 15.757,
+    "ankle_span_y_mm": 8.972,
+    "ankle_span_z_mm": 12.926,
+    "bounds_min_mm": [
+      41.849,
+      38.514,
+      10.666
+    ],
+    "bounds_max_mm": [
+      57.605,
+      47.486,
+      23.592
+    ]
+  },
+  "recommended_hidden_rigid_slot_mm": {
+    "x_mm": 21.757,
+    "y_mm": 14.972
+  },
+  "pose_body_metrics": {
+    "sleepy_compact": {
+      "belly_clearance_mm": 8.0,
+      "pitch_deg": 0.0,
+      "roll_deg": 0.0
+    },
+    "neutral": {
+      "belly_clearance_mm": 11.898,
+      "pitch_deg": -0.0,
+      "roll_deg": -0.0
+    },
+    "alert": {
+      "belly_clearance_mm": 18.913,
+      "pitch_deg": 0.0,
+      "roll_deg": -0.0
+    },
+    "happy_wide": {
+      "belly_clearance_mm": 16.5,
+      "pitch_deg": 0.0,
+      "roll_deg": 0.0
+    },
+    "play_bow": {
+      "belly_clearance_mm": 13.219,
+      "pitch_deg": 5.684,
+      "roll_deg": 0.0
+    },
+    "curious_left": {
+      "belly_clearance_mm": 13.291,
+      "pitch_deg": -0.0,
+      "roll_deg": -4.532
+    },
+    "curious_right": {
+      "belly_clearance_mm": 13.291,
+      "pitch_deg": 0.0,
+      "roll_deg": 4.532
+    },
+    "walk_diagonal": {
+      "belly_clearance_mm": 13.896,
+      "pitch_deg": 0.0,
+      "roll_deg": -0.0
+    }
+  },
+  "overload": {
+    "spring_path_force_at_hardstop_N_per_leg": 54.0,
+    "servo_saver_force_at_full_travel_N": 7.5
+  },
+  "baseline_label": "V3-F current version before iteration automation"
+}
