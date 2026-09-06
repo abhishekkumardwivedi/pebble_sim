@@ -1,0 +1,49 @@
+{
+  "timeline_duration_s": 17.55,
+  "timeline_frames_at_20fps": 352,
+  "peak_main_motor_speed_deg_s": 308.52,
+  "peak_main_motor_speed_rpm": 51.42,
+  "configured_loaded_main_limit_rpm": 85.0,
+  "peak_splay_speed_deg_s": 61.03,
+  "configured_splay_speed_limit_deg_s": 500.0,
+  "expression_belly_clearance_mm": {
+    "sleepy_crouch": 7.551,
+    "neutral": 12.605,
+    "alert": 19.361,
+    "happy_wide": 20.781,
+    "bounce_peak": 21.635,
+    "play_bow": 13.826,
+    "curious_left": 13.804,
+    "curious_right": 13.804,
+    "wide_flat": 10.914,
+    "inward_compact": 9.035,
+    "walk_diagonal": 13.041
+  },
+  "expression_roll_deg": {
+    "sleepy_crouch": 0.0,
+    "neutral": 0.0,
+    "alert": 0.0,
+    "happy_wide": 0.0,
+    "bounce_peak": 0.0,
+    "play_bow": 0.0,
+    "curious_left": -5.964,
+    "curious_right": 5.964,
+    "wide_flat": 0.0,
+    "inward_compact": 0.0,
+    "walk_diagonal": 0.013
+  },
+  "expression_pitch_deg": {
+    "sleepy_crouch": 0.029,
+    "neutral": -0.0,
+    "alert": 0.024,
+    "happy_wide": 0.093,
+    "bounce_peak": 0.103,
+    "play_bow": 5.702,
+    "curious_left": 0.214,
+    "curious_right": 0.214,
+    "wide_flat": -0.0,
+    "inward_compact": -0.0,
+    "walk_diagonal": 0.007
+  },
+  "note": "Kinematic/rate-limit validation only. Torque/contact stability requires the next dynamic MuJoCo stage."
+}
