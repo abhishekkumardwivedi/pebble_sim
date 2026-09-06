@@ -1,0 +1,91 @@
+{
+  "version": "V3-E",
+  "description": "Expressive motor-space targets bridging CAD to MuJoCo",
+  "main_leg_actuators": 4,
+  "shared_splay_actuators": 2,
+  "total_active_dof": 6,
+  "splay_limits_deg": [-18.0, 20.0],
+  "crouch_ankle_reference_z_mm": 21.432724258227637,
+  "poses": {
+    "sleepy_crouch": {
+      "joint_targets_deg": {"FL": 330.0, "FR": 330.0, "RL": 330.0, "RR": 330.0},
+      "front_splay_deg": -15.0,
+      "rear_splay_deg": -14.0,
+      "predicted_center_belly_clearance_mm": 7.551,
+      "predicted_pitch_deg": 0.029,
+      "predicted_roll_deg": 0.0
+    },
+    "neutral": {
+      "joint_targets_deg": {"FL": 296.0, "FR": 296.0, "RL": 296.0, "RR": 296.0},
+      "front_splay_deg": 0.0,
+      "rear_splay_deg": 0.0,
+      "predicted_center_belly_clearance_mm": 12.605,
+      "predicted_pitch_deg": 0.0,
+      "predicted_roll_deg": 0.0
+    },
+    "alert": {
+      "joint_targets_deg": {"FL": 242.0, "FR": 242.0, "RL": 242.0, "RR": 242.0},
+      "front_splay_deg": 6.0,
+      "rear_splay_deg": 5.0,
+      "predicted_center_belly_clearance_mm": 19.361,
+      "predicted_pitch_deg": 0.024,
+      "predicted_roll_deg": 0.0
+    },
+    "happy_wide": {
+      "joint_targets_deg": {"FL": 205.0, "FR": 205.0, "RL": 205.0, "RR": 205.0},
+      "front_splay_deg": 18.0,
+      "rear_splay_deg": 17.0,
+      "predicted_center_belly_clearance_mm": 20.781,
+      "predicted_pitch_deg": 0.093,
+      "predicted_roll_deg": 0.0
+    },
+    "play_bow": {
+      "joint_targets_deg": {"FL": 326.0, "FR": 326.0, "RL": 246.0, "RR": 246.0},
+      "front_splay_deg": 18.0,
+      "rear_splay_deg": 6.0,
+      "predicted_center_belly_clearance_mm": 13.826,
+      "predicted_pitch_deg": 5.702,
+      "predicted_roll_deg": 0.0
+    },
+    "curious_left": {
+      "joint_targets_deg": {"FL": 322.0, "FR": 252.0, "RL": 318.0, "RR": 250.0},
+      "front_splay_deg": 4.0,
+      "rear_splay_deg": 2.0,
+      "predicted_center_belly_clearance_mm": 13.804,
+      "predicted_pitch_deg": 0.214,
+      "predicted_roll_deg": -5.964
+    },
+    "curious_right": {
+      "joint_targets_deg": {"FL": 252.0, "FR": 322.0, "RL": 250.0, "RR": 318.0},
+      "front_splay_deg": 4.0,
+      "rear_splay_deg": 2.0,
+      "predicted_center_belly_clearance_mm": 13.804,
+      "predicted_pitch_deg": 0.214,
+      "predicted_roll_deg": 5.964
+    },
+    "wide_flat": {
+      "joint_targets_deg": {"FL": 300.0, "FR": 300.0, "RL": 300.0, "RR": 300.0},
+      "front_splay_deg": 20.0,
+      "rear_splay_deg": 20.0,
+      "predicted_center_belly_clearance_mm": 10.914,
+      "predicted_pitch_deg": 0.0,
+      "predicted_roll_deg": 0.0
+    },
+    "inward_compact": {
+      "joint_targets_deg": {"FL": 315.0, "FR": 315.0, "RL": 315.0, "RR": 315.0},
+      "front_splay_deg": -18.0,
+      "rear_splay_deg": -18.0,
+      "predicted_center_belly_clearance_mm": 9.035,
+      "predicted_pitch_deg": 0.0,
+      "predicted_roll_deg": 0.0
+    },
+    "walk_diagonal": {
+      "joint_targets_deg": {"FL": 270.0, "FR": 315.0, "RL": 315.0, "RR": 270.0},
+      "front_splay_deg": 3.0,
+      "rear_splay_deg": 2.0,
+      "predicted_center_belly_clearance_mm": 13.041,
+      "predicted_pitch_deg": 0.007,
+      "predicted_roll_deg": 0.013
+    }
+  }
+}
