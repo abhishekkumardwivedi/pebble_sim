@@ -1,0 +1,148 @@
+<mujoco model="Pebble 6DOF Educational Biped">
+  <compiler angle="degree" autolimits="true"/>
+  <option timestep="0.002" integrator="implicitfast" gravity="0 0 -9.81"/>
+
+  <visual>
+    <headlight diffuse="0.75 0.75 0.75" ambient="0.35 0.35 0.35" specular="0.2 0.2 0.2"/>
+    <rgba haze="0.12 0.14 0.18 1"/>
+    <global azimuth="135" elevation="-18"/>
+  </visual>
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" rgb1="0.19 0.21 0.24" rgb2="0.12 0.13 0.15" width="512" height="512"/>
+    <material name="floor_mat" texture="grid" texrepeat="10 10" reflectance="0.08"/>
+    <material name="body_mat" rgba="0.72 0.74 0.78 1"/>
+    <material name="link_mat" rgba="0.24 0.27 0.31 1"/>
+    <material name="foot_mat" rgba="0.18 0.19 0.21 1"/>
+
+    <!-- Motor colors: M1..M6 -->
+  </asset>
+
+  <default>
+    <joint type="hinge" damping="0.5" armature="0.012" frictionloss="0.015"/>
+    <geom condim="3" friction="0.9 0.01 0.0002"/>
+    <position kp="80" kv="5"/>
+  </default>
+
+  <worldbody>
+    <light pos="0 -1.5 2.2" dir="0 0.5 -1" diffuse="0.8 0.8 0.8"/>
+    <geom name="floor" type="plane" size="2.5 2.5 0.1" material="floor_mat" friction="1.0 0.01 0.0002"/>
+
+    <!-- Fixed pelvis is intentional for the first educational joint demo. -->
+    <body name="pelvis" pos="0 0 0.435">
+      <geom name="pelvis_geom" type="box" size="0.09 0.075 0.04" material="body_mat" mass="0.55" contype="0" conaffinity="0"/>
+
+      <body name="torso" pos="-0.005 0 0.115">
+        <geom type="box" size="0.085 0.065 0.075" material="body_mat" mass="0.65" contype="0" conaffinity="0"/>
+        <body name="head" pos="0.015 0 0.135">
+          <geom type="sphere" size="0.055" material="body_mat" mass="0.18" contype="0" conaffinity="0"/>
+          <geom type="box" pos="0.046 0 0" size="0.012 0.034 0.020" rgba="0.08 0.10 0.12 1" mass="0.01" contype="0" conaffinity="0"/>
+        </body>
+      </body>
+
+      <!-- LEFT LEG: M1 yaw -> M2 roll -> M3 pitch -> M4 knee -> M5 ankle pitch -> M6 ankle roll -->
+      <body name="l_hip_yaw_body" pos="0 0.060 -0.040">
+        <joint name="l_hip_yaw" axis="0 0 1" range="-35 35"/>
+        <geom name="motor_l_hip_yaw" type="cylinder" size="0.026 0.010" rgba="0.90 0.28 0.22 1" mass="0.025" contype="0" conaffinity="0"/>
+
+        <body name="l_hip_roll_body">
+          <joint name="l_hip_roll" axis="1 0 0" range="-30 30"/>
+          <geom name="motor_l_hip_roll" type="cylinder" size="0.023 0.010" euler="0 90 0" rgba="0.24 0.72 0.38 1" mass="0.025" contype="0" conaffinity="0"/>
+
+          <body name="l_hip_pitch_body">
+            <joint name="l_hip_pitch" axis="0 1 0" range="-70 70"/>
+            <geom name="motor_l_hip_pitch" type="cylinder" size="0.020 0.012" euler="90 0 0" rgba="0.20 0.50 0.90 1" mass="0.025" contype="0" conaffinity="0"/>
+
+            <body name="l_thigh">
+              <geom name="l_thigh_geom" type="capsule" fromto="0 0 -0.012 0 0 -0.168" size="0.025" material="link_mat" mass="0.24" contype="0" conaffinity="0"/>
+
+              <body name="l_knee_body" pos="0 0 -0.180">
+                <joint name="l_knee_pitch" axis="0 1 0" range="0 125"/>
+                <geom name="motor_l_knee_pitch" type="cylinder" size="0.025 0.012" euler="90 0 0" rgba="0.95 0.60 0.16 1" mass="0.03" contype="0" conaffinity="0"/>
+
+                <body name="l_shin">
+                  <geom name="l_shin_geom" type="capsule" fromto="0 0 -0.012 0 0 -0.168" size="0.022" material="link_mat" mass="0.20" contype="0" conaffinity="0"/>
+
+                  <body name="l_ankle_pitch_body" pos="0 0 -0.180">
+                    <joint name="l_ankle_pitch" axis="0 1 0" range="-45 45"/>
+                    <geom name="motor_l_ankle_pitch" type="cylinder" size="0.022 0.010" euler="90 0 0" rgba="0.62 0.34 0.88 1" mass="0.025" contype="0" conaffinity="0"/>
+
+                    <body name="l_ankle_roll_body">
+                      <joint name="l_ankle_roll" axis="1 0 0" range="-30 30"/>
+                      <geom name="motor_l_ankle_roll" type="cylinder" size="0.019 0.011" euler="0 90 0" rgba="0.12 0.72 0.72 1" mass="0.025" contype="0" conaffinity="0"/>
+
+                      <body name="l_foot" pos="0.025 0 -0.017">
+                        <geom name="l_foot_geom" type="box" size="0.065 0.035 0.017" material="foot_mat" mass="0.16" friction="1.1 0.01 0.0002"/>
+                        <site name="l_sole" pos="0 0 -0.017" size="0.006" rgba="1 1 1 0.35"/>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- RIGHT LEG -->
+      <body name="r_hip_yaw_body" pos="0 -0.060 -0.040">
+        <joint name="r_hip_yaw" axis="0 0 1" range="-35 35"/>
+        <geom name="motor_r_hip_yaw" type="cylinder" size="0.026 0.010" rgba="0.90 0.28 0.22 1" mass="0.025" contype="0" conaffinity="0"/>
+
+        <body name="r_hip_roll_body">
+          <joint name="r_hip_roll" axis="1 0 0" range="-30 30"/>
+          <geom name="motor_r_hip_roll" type="cylinder" size="0.023 0.010" euler="0 90 0" rgba="0.24 0.72 0.38 1" mass="0.025" contype="0" conaffinity="0"/>
+
+          <body name="r_hip_pitch_body">
+            <joint name="r_hip_pitch" axis="0 1 0" range="-70 70"/>
+            <geom name="motor_r_hip_pitch" type="cylinder" size="0.020 0.012" euler="90 0 0" rgba="0.20 0.50 0.90 1" mass="0.025" contype="0" conaffinity="0"/>
+
+            <body name="r_thigh">
+              <geom name="r_thigh_geom" type="capsule" fromto="0 0 -0.012 0 0 -0.168" size="0.025" material="link_mat" mass="0.24" contype="0" conaffinity="0"/>
+
+              <body name="r_knee_body" pos="0 0 -0.180">
+                <joint name="r_knee_pitch" axis="0 1 0" range="0 125"/>
+                <geom name="motor_r_knee_pitch" type="cylinder" size="0.025 0.012" euler="90 0 0" rgba="0.95 0.60 0.16 1" mass="0.03" contype="0" conaffinity="0"/>
+
+                <body name="r_shin">
+                  <geom name="r_shin_geom" type="capsule" fromto="0 0 -0.012 0 0 -0.168" size="0.022" material="link_mat" mass="0.20" contype="0" conaffinity="0"/>
+
+                  <body name="r_ankle_pitch_body" pos="0 0 -0.180">
+                    <joint name="r_ankle_pitch" axis="0 1 0" range="-45 45"/>
+                    <geom name="motor_r_ankle_pitch" type="cylinder" size="0.022 0.010" euler="90 0 0" rgba="0.62 0.34 0.88 1" mass="0.025" contype="0" conaffinity="0"/>
+
+                    <body name="r_ankle_roll_body">
+                      <joint name="r_ankle_roll" axis="1 0 0" range="-30 30"/>
+                      <geom name="motor_r_ankle_roll" type="cylinder" size="0.019 0.011" euler="0 90 0" rgba="0.12 0.72 0.72 1" mass="0.025" contype="0" conaffinity="0"/>
+
+                      <body name="r_foot" pos="0.025 0 -0.017">
+                        <geom name="r_foot_geom" type="box" size="0.065 0.035 0.017" material="foot_mat" mass="0.16" friction="1.1 0.01 0.0002"/>
+                        <site name="r_sole" pos="0 0 -0.017" size="0.006" rgba="1 1 1 0.35"/>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="a_l_hip_yaw" joint="l_hip_yaw"/>
+    <position name="a_l_hip_roll" joint="l_hip_roll"/>
+    <position name="a_l_hip_pitch" joint="l_hip_pitch"/>
+    <position name="a_l_knee_pitch" joint="l_knee_pitch"/>
+    <position name="a_l_ankle_pitch" joint="l_ankle_pitch"/>
+    <position name="a_l_ankle_roll" joint="l_ankle_roll"/>
+
+    <position name="a_r_hip_yaw" joint="r_hip_yaw"/>
+    <position name="a_r_hip_roll" joint="r_hip_roll"/>
+    <position name="a_r_hip_pitch" joint="r_hip_pitch"/>
+    <position name="a_r_knee_pitch" joint="r_knee_pitch"/>
+    <position name="a_r_ankle_pitch" joint="r_ankle_pitch"/>
+    <position name="a_r_ankle_roll" joint="r_ankle_roll"/>
+  </actuator>
+</mujoco>
